@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body{
+				overflow: hidden;
+			}
+			#gameover {
+				font-weight: bold;
+				font-size: 14px;
+				color: red;
+				position: absolute;
+				left: 100px;
+				top: 200px;
+			  	transition: font-size 2s;
+			  	z-index: 1000;
+			  	visibility: hidden;
+			}
+		</style>
+		<script>
+			function antwiggle(whichant){
+				var whichimage = whichant;
+				var id = setInterval(antframe,100);
+				var whichframe=0;
+				var goingup = true;
+				function antframe(){
+					var isalive = parseInt(document.getElementById("antalive"+whichimage).value);
+					if(isalive==0){
+						clearInterval(id);
+					}else if(goingup){
+						whichframe++;
+						if(whichframe==3){
+							goingup = false;
+						}
+					}else{
+						whichframe--;
+						if(whichframe==0){
+							goingup= true;
+						}
+					}
+					document.getElementById("ant"+whichimage).src = "ant"+whichframe+".png";
+				}
+			}
+			
+			function antmove(whichant){
+				var whichimage = whichant;
+				var id = setInterval(antframe,70);
+				//var myx = 0;
+				var godown = false;
+				function antframe(){
+					var myy = 0;
+					var myx = 0;
+					var ifkill = false;
+					var isalive = parseInt(document.getElementById("antalive"+whichimage).value);
+					if(isalive==0){
+						clearInterval(id);
+					}else{
+						myx = parseInt(document.getElementById("antxpos"+whichimage).value);
+						myy = parseInt(document.getElementById("antypos"+whichimage).value);
+						if(parseInt(document.getElementById("antypos"+whichimage).value)>=500){
+							godown = false;
+							
+						}else{
+							godown = true;
+						}
+						
+						
+						//if kill this ant
+						userxpos = parseInt(document.getElementById("userxpos").value);
+						userypos = parseInt(document.getElementById("userypos").value);
+						
+						
+						
+						if(userxpos<=myx+40 && userxpos+10>myx 
+							&& myy<=userypos+10 && myy+10>=userypos){
+							ifkill = true;
+							clearInterval(id);
+							killant(whichimage);
+						}
+		
+						
+						if(godown){
+							myy += 5;
+							if(myy>500){
+								godown = false;
+								clearInterval(id);
+								gameover();
+								//gameover stop all ants
+							}
+						}else{
+							clearInterval(id);
+							gameover();
+							//gameover stop all ants
+						}
+						document.getElementById("antypos"+whichimage).value=myy;
+						document.getElementById("ant"+whichimage).style.top=myy+"px";
+					}
+				}
+			}
+			
+			function gameover(){
+				//Stop all ants
+				//document.getElementById("antalive1").value = 0;
+				
+				
+				document.getElementById("gameover").style.visibility = "visible";
+				document.getElementById("gameover").style.fontSize = "44px";
+				document.getElementById("ifgameover").value = "0";
+				// Gameover sign
+				var myaudio = document.createElement("audio");
+				var mysource = document.createElement("source");
+				mysource.src = "eating.mp3";
+				myaudio.appendChild(mysource);
+				myaudio.play();
+				
+			}
+			
+			function createcrush(xcoord, ycoord,whichone){
+				
+				var myaudio = document.createElement("audio");
+				var mysource = document.createElement("source");
+				mysource.src = "squish.mp3";
+				myaudio.appendChild(mysource);
+				myaudio.play();
+				var mycrush = document.createElement("img");
+				mycrush.src = "deadant.png";
+				mycrush.id = "crush"+whichone;
+				mycrush.style.position=  "absolute";
+				mycrush.style.top=  ycoord+"px";
+				mycrush.style.left=  xcoord+"px";
+				mycrush.style.width=  "30px";
+				document.getElementById("crush").appendChild(mycrush);
+
+			}
+			 
+			
+			function killant(whichant){
+				var xpos = document.getElementById("antxpos"+whichant).value;
+				var ypos = document.getElementById("antypos"+whichant).value;
+			
+				createcrush(xpos,ypos,whichant);
+				
+
+						
+				document.getElementById("antalive"+whichant).value=0;
+				document.getElementById("ant"+whichant).style.visibility="hidden";
+				var noantskill = parseInt(document.getElementById("noantskill").value);
+				document.getElementById("noantskill").value = noantskill+1;
+				messages.innerHTML= "Ants Killed:"+ document.getElementById("noantskill").value;
+				
+				document.getElementById("userxpos").value="";
+				document.getElementById("userxpos").value="";
+			}
+			
+			function gamesetup(noants){
+//				antwiggle(0);
+//				antwiggle(1);
+//				antmove(0);
+//				antmove(1);
+				var x =0; // the 0th ant
+				var myhidden;
+				var counter = 0;
+	/*			myhidden = document.createElement("input");
+				myhidden.type = "hidden";
+				myhidden.name = "level";
+				myhidden.id = "level";
+				myhidden.value = 1;
+				ants.appendChild(myhidden);*/
+				var level =1;
+				levelid.innerHTML= "level:"+"1";
+				
+				myhidden = document.createElement("input");
+				myhidden.type = "hidden";
+				myhidden.name = "noantskill";
+				myhidden.id = "noantskill";
+				myhidden.value = 0;
+				ants.appendChild(myhidden);
+				messages.innerHTML= "Ants Killed: 0";
+//				var level = parseInt(document.getElementById("level").value);
+				var id = setInterval(function(){
+					counter++;
+//					var firsttime = 1000;
+					
+					
+					
+
+//					var level = parseInt(document.getElementById("level").value);
+					if(counter % Math.ceil(1000 /  level) ==0){
+						console.log(level)
+						console.log(counter)
+						console.log("------")
+						
+						myhidden = document.createElement("input");
+						myhidden.type = "hidden";
+						myhidden.name = "antalive"+x;
+						myhidden.id = "antalive"+x;
+						myhidden.value = 1;
+						document.getElementById("ants").appendChild(myhidden);
+						
+						myhidden = document.createElement("input");
+						myhidden.type = "hidden";
+						myhidden.name = "antxpos"+x;
+						myhidden.id = "antxpos"+x;
+						myhidden.value = Math.floor((Math.random()*500));  //Any x coordinate on the screen
+						document.getElementById("ants").appendChild(myhidden);				
+					
+						myhidden = document.createElement("input");
+						myhidden.type = "hidden";
+						myhidden.name = "antypos"+x;
+						myhidden.id = "antypos"+x;
+		//					myhidden.value = Math.floor((Math.random()*300));  //Any y coordinate on the 3/5ths of the screen
+						myhidden.value = "10px"; 
+						document.getElementById("ants").appendChild(myhidden);
+					
+					
+						myhidden = document.createElement("img");
+						myhidden.src = "ant0.png";
+						myhidden.id = "ant"+x;
+						myhidden.style.width = "30px";
+						myhidden.style.position = "absolute";
+						myhidden.style.top = document.getElementById("antypos"+x).value+"px";
+						myhidden.style.left = document.getElementById("antxpos"+x).value+"px";
+						document.getElementById("ants").appendChild(myhidden);
+						antwiggle(x);
+						antmove(x);
+						x++;
+						
+
+						
+					}
+					
+					if(counter==1000){
+							level += 1 ;
+							levelid.innerHTML= "level:"+level;
+							counter=0;
+					}
+					if(document.getElementById("ifgameover").value == "0"){
+						for(j=0;j<x;j++){
+							document.getElementById("antalive"+j).value = "0"; 
+						}
+						clearInterval(id);
+
+					}
+				}, 1);
+			}
+			
+			function userkeypress(myevent){
+				
+				if(myevent.keyCode==37)
+					fighterdir.value=-1;
+				else if(myevent.keyCode==39)
+					fighterdir.value=1;
+				else if(myevent.keyCode==32)
+					firemissiles();
+			}
+			
+			function usertouch(myevent){
+
+				document.getElementById("userxpos").value=myevent.touches[0].clientX;
+				document.getElementById("userypos").value=myevent.touches[0].clientY;
+			}
+			
+			function usermousedown(myevent){
+				document.getElementById("userxpos").value=myevent.clientX;
+				document.getElementById("userypos").value=myevent.clientY;
+				
+			}
+		</script>
+		<title>Ants Game</title>
+	</head>
+	<body onload="gamesetup();"  onmousedown="usermousedown(event)" ontouchstart="usertouch(event)">
+		<form name="antsgame">
+			<div id="MyCanvas" style="width: 400px; height: 500px; position: relative;">
+				<div id="gameover" value="1";>Game Over
+					<input type="hidden" name="ifgameover" id="ifgameover" value="1" />
+				</div>
+				<p id="messages" style="position:absolute;right:-50px;z-index: 2;"></p>
+				<p id="levelid" style="position:absolute;right:-50px;top:20px;z-index: 2;"></p>
+				<div id="ants">
+					<!--<img id="ant0" src="ant0.png" style="width:30px;height:30px;position: absolute; top:100px; left: 100px;" />
+					<img id="ant1" src="ant1.png" style="width:30px;height:30px;position: absolute; top:10px; left: 356px;" />
+					<input type="hidden" name="antalive0" id="antalive0" value="1" />
+					<input type="hidden" name="antalive1" id="antalive1" value="1" />
+					
+					<input type="hidden" name="antxpos0" id="antxpos0" value="100" />
+					<input type="hidden" name="antxpos1" id="antxpos1" value="356" />
+					
+					<input type="hidden" name="antypos0" id="antypos0" value="100" />
+					<input type="hidden" name="antypos1" id="antypos1" value="10" />-->
+				</div>
+				<div id="crush"></div>
+				<input  name="userxpos" id="userxpos" value="0" style="display: none;"/>
+				<input  name="userypos" id="userypos" value="0" style="display: none;"/>
+				<div>
+				<img  src="picnictable.png" style="height:120px;position: absolute; top:500px; z-index: -1;" />
+				<img  src="picnictable.png" style="height:120px;position: absolute; top:500px;left:220px;z-index: -1;" />
+				</div>
+			</div>
+			
+			<!--<button type="button" onclick="killant(1)">Kill UFO 1</button>-->
+			
+		</form>
+	</body>
+</html>
